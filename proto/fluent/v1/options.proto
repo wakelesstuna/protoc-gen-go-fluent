@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package fluent.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/wakelesstuna/protoc-gen-go-fluent/fluentpb;fluentpb";
+
+// Options read by protoc-gen-go-fluent to generate a fluent Go client.
+//
+// Resources form a navigation tree (Client.Shelf(id).Book(id)...).
+// List methods hang query builders off that tree, and their remaining request
+// fields become chainable setters. List requests must have page_size and
+// page_token, and responses next_page_token plus one repeated message field.
+
+// Resource declares a navigable resource.
+message Resource {
+  // Go name, e.g. "Book". Generates a BookRef type and a Book(id) method on the
+  // parent's Ref (or on Client for top-level resources).
+  string name = 1;
+  // Name of the parent resource; empty for a top-level resource.
+  string parent = 2;
+  // Request field holding this resource's identifier, e.g. "book_id".
+  // Every list request under this resource must have a string field with this name.
+  string id_field = 3;
+}
+
+// ListMethod marks an RPC to generate a query builder for.
+message ListMethod {
+  // Resource the query hangs off; empty attaches it to Client.
+  string parent = 1;
+  // Method name on the parent. Defaults to the RPC name without its "List" prefix.
+  string name = 2;
+}
+
+// Field customizes the setter generated for a request field.
+message Field {
+  // Setter name. Defaults to the field's Go name.
+  string setter = 1;
+  // For enum fields: also generate one method per non-zero value, named by this
+  // fmt pattern where %s is the value's name in CamelCase without the enum prefix.
+  // E.g. "%sMerges" turns MERGE_FILTER_EXCLUDE into ExcludeMerges().
+  string enum_shortcut = 2;
+  // Skip generating the setter.
+  bool skip = 3;
+}
+
+extend google.protobuf.FileOptions {
+  repeated Resource resource = 50001;
+}
+
+extend google.protobuf.MethodOptions {
+  ListMethod list = 50001;
+}
+
+extend google.protobuf.FieldOptions {
+  Field field = 50001;
+}

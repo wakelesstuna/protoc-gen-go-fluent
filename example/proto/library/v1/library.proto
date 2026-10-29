@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package library.v1;
+
+import "fluent/v1/options.proto";
+
+option go_package = "github.com/wakelesstuna/protoc-gen-go-fluent/example/gen/library/v1;libraryv1";
+
+// Navigation tree: Client.Shelf(shelfId).Book(bookId)
+option (fluent.v1.resource) = {
+  name: "Shelf"
+  id_field: "shelf_id"
+};
+option (fluent.v1.resource) = {
+  name: "Book"
+  parent: "Shelf"
+  id_field: "book_id"
+};
+
+// LibraryService is a small example API showing every generator feature.
+service LibraryService {
+  // ListShelves returns the library's shelves.
+  rpc ListShelves(ListShelvesRequest) returns (ListShelvesResponse) {
+    option (fluent.v1.list) = {};
+  }
+  // ListBooks returns the books on a shelf.
+  rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
+    option (fluent.v1.list) = {parent: "Shelf"};
+  }
+  // ListReviews returns reviews of a book, newest first.
+  rpc ListReviews(ListReviewsRequest) returns (ListReviewsResponse) {
+    option (fluent.v1.list) = {parent: "Book"};
+  }
+}
+
+message ListShelvesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListShelvesResponse {
+  repeated Shelf shelves = 1;
+  string next_page_token = 2;
+}
+
+message Shelf {
+  string id = 1;
+  string theme = 2;
+}
+
+message ListBooksRequest {
+  string shelf_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+  // Only books by this author.
+  string author = 4;
+  // Only books whose title contains this text.
+  string title_contains = 5 [(fluent.v1.field).setter = "Title"];
+  // Only books in this genre.
+  Genre genre = 6 [(fluent.v1.field).enum_shortcut = "Only%s"];
+  // Server-internal tracing flag; not exposed by the client.
+  bool debug = 7 [(fluent.v1.field).skip = true];
+}
+
+enum Genre {
+  GENRE_UNSPECIFIED = 0;
+  GENRE_FICTION = 1;
+  GENRE_SCIENCE_FICTION = 2;
+  GENRE_NON_FICTION = 3;
+}
+
+message ListBooksResponse {
+  repeated Book books = 1;
+  string next_page_token = 2;
+}
+
+message Book {
+  string id = 1;
+  string title = 2;
+  string author = 3;
+  Genre genre = 4;
+}
+
+message ListReviewsRequest {
+  string shelf_id = 1;
+  string book_id = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+  // Only reviews with at least this many stars.
+  int32 min_stars = 5;
+}
+
+message ListReviewsResponse {
+  repeated Review reviews = 1;
+  string next_page_token = 2;
+}
+
+message Review {
+  string id = 1;
+  int32 stars = 2;
+  string text = 3;
+}

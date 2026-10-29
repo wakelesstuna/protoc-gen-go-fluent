@@ -1,0 +1,3 @@
+* text=auto eol=lf
+*.pb.go linguist-generated=true
+*.gen.go linguist-generated=true

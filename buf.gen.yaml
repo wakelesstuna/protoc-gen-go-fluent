@@ -1,0 +1,15 @@
+# Generates fluentpb (from the options) and the example client.
+# Run from the repository root: buf generate
+version: v2
+plugins:
+  - local: protoc-gen-go
+    out: .
+    opt: module=github.com/wakelesstuna/protoc-gen-go-fluent
+  - local: protoc-gen-go-grpc
+    out: .
+    opt: module=github.com/wakelesstuna/protoc-gen-go-fluent
+  - local: ["go", "run", "."]
+    out: example/libraryclient
+    strategy: all
+    opt:
+      - import_path=github.com/wakelesstuna/protoc-gen-go-fluent/example/libraryclient
