@@ -143,6 +143,64 @@ func (x *ListMethod) GetName() string {
 	return ""
 }
 
+// GetMethod marks an RPC that fetches one resource. Generates
+// <Resource>Ref.<name>(ctx) returning the RPC's response message.
+// The request may only contain the id fields of the resource and its ancestors
+// (other fields must be marked skip).
+type GetMethod struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Resource to fetch, e.g. "Book".
+	Resource string `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
+	// Method name on the Ref. Defaults to "Get".
+	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMethod) Reset() {
+	*x = GetMethod{}
+	mi := &file_fluent_v1_options_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMethod) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMethod) ProtoMessage() {}
+
+func (x *GetMethod) ProtoReflect() protoreflect.Message {
+	mi := &file_fluent_v1_options_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMethod.ProtoReflect.Descriptor instead.
+func (*GetMethod) Descriptor() ([]byte, []int) {
+	return file_fluent_v1_options_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetMethod) GetResource() string {
+	if x != nil {
+		return x.Resource
+	}
+	return ""
+}
+
+func (x *GetMethod) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 // Field customizes the setter generated for a request field.
 type Field struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -160,7 +218,7 @@ type Field struct {
 
 func (x *Field) Reset() {
 	*x = Field{}
-	mi := &file_fluent_v1_options_proto_msgTypes[2]
+	mi := &file_fluent_v1_options_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -172,7 +230,7 @@ func (x *Field) String() string {
 func (*Field) ProtoMessage() {}
 
 func (x *Field) ProtoReflect() protoreflect.Message {
-	mi := &file_fluent_v1_options_proto_msgTypes[2]
+	mi := &file_fluent_v1_options_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -185,7 +243,7 @@ func (x *Field) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Field.ProtoReflect.Descriptor instead.
 func (*Field) Descriptor() ([]byte, []int) {
-	return file_fluent_v1_options_proto_rawDescGZIP(), []int{2}
+	return file_fluent_v1_options_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Field) GetSetter() string {
@@ -227,6 +285,14 @@ var file_fluent_v1_options_proto_extTypes = []protoimpl.ExtensionInfo{
 		Filename:      "fluent/v1/options.proto",
 	},
 	{
+		ExtendedType:  (*descriptorpb.MethodOptions)(nil),
+		ExtensionType: (*GetMethod)(nil),
+		Field:         50002,
+		Name:          "fluent.v1.get",
+		Tag:           "bytes,50002,opt,name=get",
+		Filename:      "fluent/v1/options.proto",
+	},
+	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*Field)(nil),
 		Field:         50001,
@@ -246,12 +312,14 @@ var (
 var (
 	// optional fluent.v1.ListMethod list = 50001;
 	E_List = &file_fluent_v1_options_proto_extTypes[1]
+	// optional fluent.v1.GetMethod get = 50002;
+	E_Get = &file_fluent_v1_options_proto_extTypes[2]
 )
 
 // Extension fields to descriptorpb.FieldOptions.
 var (
 	// optional fluent.v1.Field field = 50001;
-	E_Field = &file_fluent_v1_options_proto_extTypes[2]
+	E_Field = &file_fluent_v1_options_proto_extTypes[3]
 )
 
 var File_fluent_v1_options_proto protoreflect.FileDescriptor
@@ -266,13 +334,17 @@ const file_fluent_v1_options_proto_rawDesc = "" +
 	"\n" +
 	"ListMethod\x12\x16\n" +
 	"\x06parent\x18\x01 \x01(\tR\x06parent\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\";\n" +
+	"\tGetMethod\x12\x1a\n" +
+	"\bresource\x18\x01 \x01(\tR\bresource\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\"X\n" +
 	"\x05Field\x12\x16\n" +
 	"\x06setter\x18\x01 \x01(\tR\x06setter\x12#\n" +
 	"\renum_shortcut\x18\x02 \x01(\tR\fenumShortcut\x12\x12\n" +
 	"\x04skip\x18\x03 \x01(\bR\x04skip:O\n" +
 	"\bresource\x12\x1c.google.protobuf.FileOptions\x18ц\x03 \x03(\v2\x13.fluent.v1.ResourceR\bresource:K\n" +
-	"\x04list\x12\x1e.google.protobuf.MethodOptions\x18ц\x03 \x01(\v2\x15.fluent.v1.ListMethodR\x04list:G\n" +
+	"\x04list\x12\x1e.google.protobuf.MethodOptions\x18ц\x03 \x01(\v2\x15.fluent.v1.ListMethodR\x04list:H\n" +
+	"\x03get\x12\x1e.google.protobuf.MethodOptions\x18҆\x03 \x01(\v2\x14.fluent.v1.GetMethodR\x03get:G\n" +
 	"\x05field\x12\x1d.google.protobuf.FieldOptions\x18ц\x03 \x01(\v2\x10.fluent.v1.FieldR\x05fieldB@Z>github.com/wakelesstuna/protoc-gen-go-fluent/fluentpb;fluentpbb\x06proto3"
 
 var (
@@ -287,26 +359,29 @@ func file_fluent_v1_options_proto_rawDescGZIP() []byte {
 	return file_fluent_v1_options_proto_rawDescData
 }
 
-var file_fluent_v1_options_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_fluent_v1_options_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_fluent_v1_options_proto_goTypes = []any{
 	(*Resource)(nil),                   // 0: fluent.v1.Resource
 	(*ListMethod)(nil),                 // 1: fluent.v1.ListMethod
-	(*Field)(nil),                      // 2: fluent.v1.Field
-	(*descriptorpb.FileOptions)(nil),   // 3: google.protobuf.FileOptions
-	(*descriptorpb.MethodOptions)(nil), // 4: google.protobuf.MethodOptions
-	(*descriptorpb.FieldOptions)(nil),  // 5: google.protobuf.FieldOptions
+	(*GetMethod)(nil),                  // 2: fluent.v1.GetMethod
+	(*Field)(nil),                      // 3: fluent.v1.Field
+	(*descriptorpb.FileOptions)(nil),   // 4: google.protobuf.FileOptions
+	(*descriptorpb.MethodOptions)(nil), // 5: google.protobuf.MethodOptions
+	(*descriptorpb.FieldOptions)(nil),  // 6: google.protobuf.FieldOptions
 }
 var file_fluent_v1_options_proto_depIdxs = []int32{
-	3, // 0: fluent.v1.resource:extendee -> google.protobuf.FileOptions
-	4, // 1: fluent.v1.list:extendee -> google.protobuf.MethodOptions
-	5, // 2: fluent.v1.field:extendee -> google.protobuf.FieldOptions
-	0, // 3: fluent.v1.resource:type_name -> fluent.v1.Resource
-	1, // 4: fluent.v1.list:type_name -> fluent.v1.ListMethod
-	2, // 5: fluent.v1.field:type_name -> fluent.v1.Field
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	3, // [3:6] is the sub-list for extension type_name
-	0, // [0:3] is the sub-list for extension extendee
+	4, // 0: fluent.v1.resource:extendee -> google.protobuf.FileOptions
+	5, // 1: fluent.v1.list:extendee -> google.protobuf.MethodOptions
+	5, // 2: fluent.v1.get:extendee -> google.protobuf.MethodOptions
+	6, // 3: fluent.v1.field:extendee -> google.protobuf.FieldOptions
+	0, // 4: fluent.v1.resource:type_name -> fluent.v1.Resource
+	1, // 5: fluent.v1.list:type_name -> fluent.v1.ListMethod
+	2, // 6: fluent.v1.get:type_name -> fluent.v1.GetMethod
+	3, // 7: fluent.v1.field:type_name -> fluent.v1.Field
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	4, // [4:8] is the sub-list for extension type_name
+	0, // [0:4] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
 
@@ -321,8 +396,8 @@ func file_fluent_v1_options_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_fluent_v1_options_proto_rawDesc), len(file_fluent_v1_options_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
-			NumExtensions: 3,
+			NumMessages:   4,
+			NumExtensions: 4,
 			NumServices:   0,
 		},
 		GoTypes:           file_fluent_v1_options_proto_goTypes,

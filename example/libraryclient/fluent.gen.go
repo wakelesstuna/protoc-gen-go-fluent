@@ -64,6 +64,35 @@ type BookRef struct {
 	bookId  string
 }
 
+// Get calls LibraryService.GetShelf for this Shelf.
+//
+// GetShelf returns one shelf.
+func (r ShelfRef) Get(ctx context.Context) (*v1.Shelf, error) {
+	stub := v1.NewLibraryServiceClient(r.c.Conn.ClientConn())
+	resp, err := stub.GetShelf(r.c.Conn.Outgoing(ctx), &v1.GetShelfRequest{
+		ShelfId: r.shelfId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resp.GetShelf(), nil
+}
+
+// Get calls LibraryService.GetBook for this Book.
+//
+// GetBook returns one book.
+func (r BookRef) Get(ctx context.Context) (*v1.Book, error) {
+	stub := v1.NewLibraryServiceClient(r.c.Conn.ClientConn())
+	resp, err := stub.GetBook(r.c.Conn.Outgoing(ctx), &v1.GetBookRequest{
+		ShelfId: r.shelfId,
+		BookId:  r.bookId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resp.GetBook(), nil
+}
+
 // Shelves starts a query calling LibraryService.ListShelves.
 //
 // ListShelves returns the library's shelves.

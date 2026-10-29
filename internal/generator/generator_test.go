@@ -230,6 +230,8 @@ func TestGenerateErrors(t *testing.T) {
 				})
 				proto.ClearExtension(method(f, "ListBooks").Options, fluentpb.E_List)
 				proto.ClearExtension(method(f, "ListReviews").Options, fluentpb.E_List)
+				proto.ClearExtension(method(f, "GetShelf").Options, fluentpb.E_Get)
+				proto.ClearExtension(method(f, "GetBook").Options, fluentpb.E_Get)
 			},
 			wantErr: "resource Close collides with Client.Close",
 		},
@@ -284,6 +286,110 @@ func TestInvalidQueryNameExplainsFix(t *testing.T) {
 	})
 	if err == nil || !strings.Contains(err.Error(), "library.v1.LibraryService.ListBooks") || !strings.Contains(err.Error(), "(fluent.v1.list) = {name:") {
 		t.Errorf("err = %v", err)
+	}
+}
+
+func TestGenerateGet(t *testing.T) {
+	out, err := generate(t, Config{Client: true}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{
+		"func (r ShelfRef) Get(ctx context.Context) (*v1.Shelf, error)",
+		"func (r BookRef) Get(ctx context.Context) (*v1.Book, error)",
+		"resp, err := stub.GetBook(r.c.Conn.Outgoing(ctx), &v1.GetBookRequest{",
+		"BookId:  r.bookId,",
+		"return resp.GetBook(), nil",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("generated code missing %q", want)
+		}
+	}
+
+	// An RPC returning the resource itself is returned as is.
+	out, err = generate(t, Config{Client: true}, func(f *descriptorpb.FileDescriptorProto) {
+		method(f, "GetBook").OutputType = proto.String(".library.v1.Book")
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, "func (r BookRef) Get(ctx context.Context) (*v1.Book, error)") || !strings.Contains(out, "return resp, nil") {
+		t.Error("direct resource response not returned as is")
+	}
+
+	// A custom name.
+	out, err = generate(t, Config{Client: true}, func(f *descriptorpb.FileDescriptorProto) {
+		proto.SetExtension(method(f, "GetBook").Options, fluentpb.E_Get, &fluentpb.GetMethod{Resource: "Book", Name: "Fetch"})
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, "func (r BookRef) Fetch(ctx context.Context) (*v1.Book, error)") {
+		t.Error("custom get name ignored")
+	}
+}
+
+func TestGenerateGetErrors(t *testing.T) {
+	tests := []struct {
+		name    string
+		mutate  func(f *descriptorpb.FileDescriptorProto)
+		wantErr string
+	}{
+		{
+			name: "unknown resource",
+			mutate: func(f *descriptorpb.FileDescriptorProto) {
+				proto.SetExtension(method(f, "GetBook").Options, fluentpb.E_Get, &fluentpb.GetMethod{Resource: "Nope"})
+			},
+			wantErr: `unknown resource "Nope"`,
+		},
+		{
+			name: "missing resource",
+			mutate: func(f *descriptorpb.FileDescriptorProto) {
+				proto.SetExtension(method(f, "GetBook").Options, fluentpb.E_Get, &fluentpb.GetMethod{})
+			},
+			wantErr: "(fluent.v1.get) needs resource",
+		},
+		{
+			name: "missing ancestor id",
+			mutate: func(f *descriptorpb.FileDescriptorProto) {
+				removeField(message(f, "GetBookRequest"), "shelf_id")
+			},
+			wantErr: "GetBookRequest is missing field shelf_id (id_field of resource Shelf)",
+		},
+		{
+			name: "extra request field",
+			mutate: func(f *descriptorpb.FileDescriptorProto) {
+				m := message(f, "GetBookRequest")
+				m.Field = append(m.Field, &descriptorpb.FieldDescriptorProto{
+					Name: proto.String("view"), JsonName: proto.String("view"), Number: proto.Int32(3),
+					Label: descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum(),
+					Type:  descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum(),
+				})
+			},
+			wantErr: "get request field view is not an id field",
+		},
+		{
+			name: "both list and get",
+			mutate: func(f *descriptorpb.FileDescriptorProto) {
+				proto.SetExtension(method(f, "ListBooks").Options, fluentpb.E_Get, &fluentpb.GetMethod{Resource: "Shelf"})
+			},
+			wantErr: "can't be both list and get",
+		},
+		{
+			name: "get name collides with list",
+			mutate: func(f *descriptorpb.FileDescriptorProto) {
+				proto.SetExtension(method(f, "GetShelf").Options, fluentpb.E_Get, &fluentpb.GetMethod{Resource: "Shelf", Name: "Books"})
+			},
+			wantErr: "both generate ShelfRef.Books",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := generate(t, Config{Client: true}, tt.mutate)
+			if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
+				t.Errorf("err = %v, want containing %q", err, tt.wantErr)
+			}
+		})
 	}
 }
 

@@ -19,6 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	LibraryService_GetShelf_FullMethodName    = "/library.v1.LibraryService/GetShelf"
+	LibraryService_GetBook_FullMethodName     = "/library.v1.LibraryService/GetBook"
 	LibraryService_ListShelves_FullMethodName = "/library.v1.LibraryService/ListShelves"
 	LibraryService_ListBooks_FullMethodName   = "/library.v1.LibraryService/ListBooks"
 	LibraryService_ListReviews_FullMethodName = "/library.v1.LibraryService/ListReviews"
@@ -30,6 +32,10 @@ const (
 //
 // LibraryService is a small example API showing every generator feature.
 type LibraryServiceClient interface {
+	// GetShelf returns one shelf.
+	GetShelf(ctx context.Context, in *GetShelfRequest, opts ...grpc.CallOption) (*GetShelfResponse, error)
+	// GetBook returns one book.
+	GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
 	// ListShelves returns the library's shelves.
 	ListShelves(ctx context.Context, in *ListShelvesRequest, opts ...grpc.CallOption) (*ListShelvesResponse, error)
 	// ListBooks returns the books on a shelf.
@@ -44,6 +50,26 @@ type libraryServiceClient struct {
 
 func NewLibraryServiceClient(cc grpc.ClientConnInterface) LibraryServiceClient {
 	return &libraryServiceClient{cc}
+}
+
+func (c *libraryServiceClient) GetShelf(ctx context.Context, in *GetShelfRequest, opts ...grpc.CallOption) (*GetShelfResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetShelfResponse)
+	err := c.cc.Invoke(ctx, LibraryService_GetShelf_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *libraryServiceClient) GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBookResponse)
+	err := c.cc.Invoke(ctx, LibraryService_GetBook_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *libraryServiceClient) ListShelves(ctx context.Context, in *ListShelvesRequest, opts ...grpc.CallOption) (*ListShelvesResponse, error) {
@@ -82,6 +108,10 @@ func (c *libraryServiceClient) ListReviews(ctx context.Context, in *ListReviewsR
 //
 // LibraryService is a small example API showing every generator feature.
 type LibraryServiceServer interface {
+	// GetShelf returns one shelf.
+	GetShelf(context.Context, *GetShelfRequest) (*GetShelfResponse, error)
+	// GetBook returns one book.
+	GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error)
 	// ListShelves returns the library's shelves.
 	ListShelves(context.Context, *ListShelvesRequest) (*ListShelvesResponse, error)
 	// ListBooks returns the books on a shelf.
@@ -98,6 +128,12 @@ type LibraryServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedLibraryServiceServer struct{}
 
+func (UnimplementedLibraryServiceServer) GetShelf(context.Context, *GetShelfRequest) (*GetShelfResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetShelf not implemented")
+}
+func (UnimplementedLibraryServiceServer) GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBook not implemented")
+}
 func (UnimplementedLibraryServiceServer) ListShelves(context.Context, *ListShelvesRequest) (*ListShelvesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListShelves not implemented")
 }
@@ -126,6 +162,42 @@ func RegisterLibraryServiceServer(s grpc.ServiceRegistrar, srv LibraryServiceSer
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&LibraryService_ServiceDesc, srv)
+}
+
+func _LibraryService_GetShelf_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetShelfRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LibraryServiceServer).GetShelf(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LibraryService_GetShelf_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LibraryServiceServer).GetShelf(ctx, req.(*GetShelfRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LibraryService_GetBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LibraryServiceServer).GetBook(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LibraryService_GetBook_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LibraryServiceServer).GetBook(ctx, req.(*GetBookRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _LibraryService_ListShelves_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -189,6 +261,14 @@ var LibraryService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "library.v1.LibraryService",
 	HandlerType: (*LibraryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetShelf",
+			Handler:    _LibraryService_GetShelf_Handler,
+		},
+		{
+			MethodName: "GetBook",
+			Handler:    _LibraryService_GetBook_Handler,
+		},
 		{
 			MethodName: "ListShelves",
 			Handler:    _LibraryService_ListShelves_Handler,

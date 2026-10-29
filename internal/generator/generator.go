@@ -81,6 +81,16 @@ type listQuery struct {
 	setters    []setter
 }
 
+type getCall struct {
+	method     *protogen.Method
+	service    *protogen.Service
+	importPath protogen.GoImportPath // of the service's generated gRPC code
+	resource   *resource
+	name       string
+	ids        []*protogen.Field
+	unwrap     *protogen.Field // response's only field, returned instead of the response; nil returns the response
+}
+
 // Generate writes cfg.Filename for every annotated file in p. It writes nothing
 // when no resources or list methods are declared.
 func Generate(p *protogen.Plugin, cfg Config) error {
@@ -88,14 +98,14 @@ func Generate(p *protogen.Plugin, cfg Config) error {
 	if err != nil {
 		return err
 	}
-	lists, err := collectLists(p, byName)
+	lists, gets, err := collectMethods(p, byName)
 	if err != nil {
 		return err
 	}
-	if err := checkNames(resources, lists); err != nil {
+	if err := checkNames(resources, lists, gets); err != nil {
 		return err
 	}
-	if len(resources) == 0 && len(lists) == 0 {
+	if len(resources) == 0 && len(lists) == 0 && len(gets) == 0 {
 		return nil
 	}
 
@@ -109,6 +119,9 @@ func Generate(p *protogen.Plugin, cfg Config) error {
 	}
 	for _, r := range resources {
 		genResource(g, r)
+	}
+	for _, gc := range gets {
+		genGet(g, gc)
 	}
 	for _, q := range lists {
 		genList(g, q)
@@ -167,27 +180,84 @@ func collectResources(p *protogen.Plugin) ([]*resource, map[string]*resource, er
 	return order, byName, nil
 }
 
-func collectLists(p *protogen.Plugin, resources map[string]*resource) ([]*listQuery, error) {
+func collectMethods(p *protogen.Plugin, resources map[string]*resource) ([]*listQuery, []*getCall, error) {
 	var lists []*listQuery
+	var gets []*getCall
 	for _, f := range p.Files {
 		if !f.Generate {
 			continue
 		}
 		for _, s := range f.Services {
 			for _, m := range s.Methods {
-				if !proto.HasExtension(m.Desc.Options(), fluentpb.E_List) {
-					continue
+				isList := proto.HasExtension(m.Desc.Options(), fluentpb.E_List)
+				isGet := proto.HasExtension(m.Desc.Options(), fluentpb.E_Get)
+				switch {
+				case isList && isGet:
+					return nil, nil, fmt.Errorf("%s: a method can't be both list and get", m.Desc.FullName())
+				case isList:
+					q, err := newListQuery(m, resources)
+					if err != nil {
+						return nil, nil, fmt.Errorf("%s: %w", m.Desc.FullName(), err)
+					}
+					q.service, q.importPath = s, f.GoImportPath
+					lists = append(lists, q)
+				case isGet:
+					gc, err := newGetCall(m, resources)
+					if err != nil {
+						return nil, nil, fmt.Errorf("%s: %w", m.Desc.FullName(), err)
+					}
+					gc.service, gc.importPath = s, f.GoImportPath
+					gets = append(gets, gc)
 				}
-				q, err := newListQuery(m, resources)
-				if err != nil {
-					return nil, fmt.Errorf("%s: %w", m.Desc.FullName(), err)
-				}
-				q.service, q.importPath = s, f.GoImportPath
-				lists = append(lists, q)
 			}
 		}
 	}
-	return lists, nil
+	return lists, gets, nil
+}
+
+func newGetCall(m *protogen.Method, resources map[string]*resource) (*getCall, error) {
+	if m.Desc.IsStreamingClient() || m.Desc.IsStreamingServer() {
+		return nil, fmt.Errorf("streaming methods are not supported")
+	}
+	opt, _ := proto.GetExtension(m.Desc.Options(), fluentpb.E_Get).(*fluentpb.GetMethod)
+
+	gc := &getCall{method: m, name: opt.GetName()}
+	if gc.name == "" {
+		gc.name = "Get"
+	}
+	if !exportedIdent.MatchString(gc.name) {
+		return nil, fmt.Errorf("get name %q must be an exported Go identifier", gc.name)
+	}
+	if opt.GetResource() == "" {
+		return nil, fmt.Errorf("(fluent.v1.get) needs resource")
+	}
+	if gc.resource = resources[opt.GetResource()]; gc.resource == nil {
+		return nil, fmt.Errorf("unknown resource %q", opt.GetResource())
+	}
+
+	handled := map[string]bool{}
+	for _, r := range gc.resource.chain {
+		id, err := singular(m.Input, r.idField, protoreflect.StringKind)
+		if err != nil {
+			return nil, fmt.Errorf("%w (id_field of resource %s)", err, r.name)
+		}
+		gc.ids = append(gc.ids, id)
+		handled[r.idField] = true
+	}
+	for _, f := range m.Input.Fields {
+		if handled[string(f.Desc.Name())] {
+			continue
+		}
+		if fopt, _ := proto.GetExtension(f.Desc.Options(), fluentpb.E_Field).(*fluentpb.Field); !fopt.GetSkip() {
+			return nil, fmt.Errorf("get request field %s is not an id field; mark it (fluent.v1.field).skip", f.Desc.Name())
+		}
+	}
+
+	// GetShelfResponse { Shelf shelf = 1; } returns *Shelf rather than the wrapper.
+	if out := m.Output.Fields; len(out) == 1 && out[0].Message != nil && !out[0].Desc.IsList() && !out[0].Desc.IsMap() {
+		gc.unwrap = out[0]
+	}
+	return gc, nil
 }
 
 func newListQuery(m *protogen.Method, resources map[string]*resource) (*listQuery, error) {
@@ -302,7 +372,7 @@ func checkSetterType(f *protogen.Field) error {
 }
 
 // checkNames rejects generated identifiers that would collide.
-func checkNames(resources []*resource, lists []*listQuery) error {
+func checkNames(resources []*resource, lists []*listQuery, gets []*getCall) error {
 	methods := map[string]string{} // "<receiver>.<method>" -> what declared it
 	declare := func(recv, name, what string) error {
 		key := recv + "." + name
@@ -329,6 +399,11 @@ func checkNames(resources []*resource, lists []*listQuery) error {
 		}
 		types[r.name+"Ref"] = true
 		if err := declare(recvOf(r.parent), r.name, "resource "+r.name); err != nil {
+			return err
+		}
+	}
+	for _, gc := range gets {
+		if err := declare(gc.resource.name+"Ref", gc.name, string(gc.method.Desc.FullName())); err != nil {
 			return err
 		}
 	}
@@ -437,6 +512,34 @@ func genResource(g *protogen.GeneratedFile, r *resource) {
 	g.P("c *Client")
 	for _, a := range r.chain {
 		g.P(idVar(a.idField), " string")
+	}
+	g.P("}")
+	g.P()
+}
+
+func genGet(g *protogen.GeneratedFile, gc *getCall) {
+	ctx := g.QualifiedGoIdent(contextPkg.Ident("Context"))
+	out := "*" + g.QualifiedGoIdent(gc.method.Output.GoIdent)
+	if gc.unwrap != nil {
+		out = "*" + g.QualifiedGoIdent(gc.unwrap.Message.GoIdent)
+	}
+
+	g.P("// ", gc.name, " calls ", gc.service.GoName, ".", gc.method.GoName, " for this ", gc.resource.name, ".")
+	comment(g, gc.method.Comments.Leading)
+	g.P("func (r ", gc.resource.name, "Ref) ", gc.name, "(ctx ", ctx, ") (", out, ", error) {")
+	g.P("stub := ", gc.importPath.Ident("New"+gc.service.GoName+"Client"), "(r.c.Conn.ClientConn())")
+	g.P("resp, err := stub.", gc.method.GoName, "(r.c.Conn.Outgoing(ctx), &", gc.method.Input.GoIdent, "{")
+	for _, id := range gc.ids {
+		g.P(id.GoName, ": r.", idVar(string(id.Desc.Name())), ",")
+	}
+	g.P("})")
+	g.P("if err != nil {")
+	g.P("return nil, err")
+	g.P("}")
+	if gc.unwrap != nil {
+		g.P("return resp.Get", gc.unwrap.GoName, "(), nil")
+	} else {
+		g.P("return resp, nil")
 	}
 	g.P("}")
 	g.P()

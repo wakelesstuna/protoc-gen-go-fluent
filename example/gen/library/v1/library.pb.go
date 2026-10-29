@@ -74,6 +74,191 @@ func (Genre) EnumDescriptor() ([]byte, []int) {
 	return file_library_v1_library_proto_rawDescGZIP(), []int{0}
 }
 
+type GetShelfRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ShelfId       string                 `protobuf:"bytes,1,opt,name=shelf_id,json=shelfId,proto3" json:"shelf_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetShelfRequest) Reset() {
+	*x = GetShelfRequest{}
+	mi := &file_library_v1_library_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetShelfRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetShelfRequest) ProtoMessage() {}
+
+func (x *GetShelfRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_library_v1_library_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetShelfRequest.ProtoReflect.Descriptor instead.
+func (*GetShelfRequest) Descriptor() ([]byte, []int) {
+	return file_library_v1_library_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetShelfRequest) GetShelfId() string {
+	if x != nil {
+		return x.ShelfId
+	}
+	return ""
+}
+
+type GetShelfResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Shelf         *Shelf                 `protobuf:"bytes,1,opt,name=shelf,proto3" json:"shelf,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetShelfResponse) Reset() {
+	*x = GetShelfResponse{}
+	mi := &file_library_v1_library_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetShelfResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetShelfResponse) ProtoMessage() {}
+
+func (x *GetShelfResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_library_v1_library_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetShelfResponse.ProtoReflect.Descriptor instead.
+func (*GetShelfResponse) Descriptor() ([]byte, []int) {
+	return file_library_v1_library_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetShelfResponse) GetShelf() *Shelf {
+	if x != nil {
+		return x.Shelf
+	}
+	return nil
+}
+
+type GetBookRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ShelfId       string                 `protobuf:"bytes,1,opt,name=shelf_id,json=shelfId,proto3" json:"shelf_id,omitempty"`
+	BookId        string                 `protobuf:"bytes,2,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBookRequest) Reset() {
+	*x = GetBookRequest{}
+	mi := &file_library_v1_library_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBookRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBookRequest) ProtoMessage() {}
+
+func (x *GetBookRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_library_v1_library_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBookRequest.ProtoReflect.Descriptor instead.
+func (*GetBookRequest) Descriptor() ([]byte, []int) {
+	return file_library_v1_library_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetBookRequest) GetShelfId() string {
+	if x != nil {
+		return x.ShelfId
+	}
+	return ""
+}
+
+func (x *GetBookRequest) GetBookId() string {
+	if x != nil {
+		return x.BookId
+	}
+	return ""
+}
+
+// Single-message responses are unwrapped: BookRef.Get returns *Book.
+type GetBookResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Book          *Book                  `protobuf:"bytes,1,opt,name=book,proto3" json:"book,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBookResponse) Reset() {
+	*x = GetBookResponse{}
+	mi := &file_library_v1_library_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBookResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBookResponse) ProtoMessage() {}
+
+func (x *GetBookResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_library_v1_library_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBookResponse.ProtoReflect.Descriptor instead.
+func (*GetBookResponse) Descriptor() ([]byte, []int) {
+	return file_library_v1_library_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetBookResponse) GetBook() *Book {
+	if x != nil {
+		return x.Book
+	}
+	return nil
+}
+
 type ListShelvesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
@@ -84,7 +269,7 @@ type ListShelvesRequest struct {
 
 func (x *ListShelvesRequest) Reset() {
 	*x = ListShelvesRequest{}
-	mi := &file_library_v1_library_proto_msgTypes[0]
+	mi := &file_library_v1_library_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +281,7 @@ func (x *ListShelvesRequest) String() string {
 func (*ListShelvesRequest) ProtoMessage() {}
 
 func (x *ListShelvesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_library_v1_library_proto_msgTypes[0]
+	mi := &file_library_v1_library_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +294,7 @@ func (x *ListShelvesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListShelvesRequest.ProtoReflect.Descriptor instead.
 func (*ListShelvesRequest) Descriptor() ([]byte, []int) {
-	return file_library_v1_library_proto_rawDescGZIP(), []int{0}
+	return file_library_v1_library_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListShelvesRequest) GetPageSize() int32 {
@@ -136,7 +321,7 @@ type ListShelvesResponse struct {
 
 func (x *ListShelvesResponse) Reset() {
 	*x = ListShelvesResponse{}
-	mi := &file_library_v1_library_proto_msgTypes[1]
+	mi := &file_library_v1_library_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -148,7 +333,7 @@ func (x *ListShelvesResponse) String() string {
 func (*ListShelvesResponse) ProtoMessage() {}
 
 func (x *ListShelvesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_library_v1_library_proto_msgTypes[1]
+	mi := &file_library_v1_library_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -161,7 +346,7 @@ func (x *ListShelvesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListShelvesResponse.ProtoReflect.Descriptor instead.
 func (*ListShelvesResponse) Descriptor() ([]byte, []int) {
-	return file_library_v1_library_proto_rawDescGZIP(), []int{1}
+	return file_library_v1_library_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListShelvesResponse) GetShelves() []*Shelf {
@@ -188,7 +373,7 @@ type Shelf struct {
 
 func (x *Shelf) Reset() {
 	*x = Shelf{}
-	mi := &file_library_v1_library_proto_msgTypes[2]
+	mi := &file_library_v1_library_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -200,7 +385,7 @@ func (x *Shelf) String() string {
 func (*Shelf) ProtoMessage() {}
 
 func (x *Shelf) ProtoReflect() protoreflect.Message {
-	mi := &file_library_v1_library_proto_msgTypes[2]
+	mi := &file_library_v1_library_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -213,7 +398,7 @@ func (x *Shelf) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Shelf.ProtoReflect.Descriptor instead.
 func (*Shelf) Descriptor() ([]byte, []int) {
-	return file_library_v1_library_proto_rawDescGZIP(), []int{2}
+	return file_library_v1_library_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Shelf) GetId() string {
@@ -249,7 +434,7 @@ type ListBooksRequest struct {
 
 func (x *ListBooksRequest) Reset() {
 	*x = ListBooksRequest{}
-	mi := &file_library_v1_library_proto_msgTypes[3]
+	mi := &file_library_v1_library_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -261,7 +446,7 @@ func (x *ListBooksRequest) String() string {
 func (*ListBooksRequest) ProtoMessage() {}
 
 func (x *ListBooksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_library_v1_library_proto_msgTypes[3]
+	mi := &file_library_v1_library_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -274,7 +459,7 @@ func (x *ListBooksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBooksRequest.ProtoReflect.Descriptor instead.
 func (*ListBooksRequest) Descriptor() ([]byte, []int) {
-	return file_library_v1_library_proto_rawDescGZIP(), []int{3}
+	return file_library_v1_library_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListBooksRequest) GetShelfId() string {
@@ -336,7 +521,7 @@ type ListBooksResponse struct {
 
 func (x *ListBooksResponse) Reset() {
 	*x = ListBooksResponse{}
-	mi := &file_library_v1_library_proto_msgTypes[4]
+	mi := &file_library_v1_library_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -348,7 +533,7 @@ func (x *ListBooksResponse) String() string {
 func (*ListBooksResponse) ProtoMessage() {}
 
 func (x *ListBooksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_library_v1_library_proto_msgTypes[4]
+	mi := &file_library_v1_library_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -361,7 +546,7 @@ func (x *ListBooksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBooksResponse.ProtoReflect.Descriptor instead.
 func (*ListBooksResponse) Descriptor() ([]byte, []int) {
-	return file_library_v1_library_proto_rawDescGZIP(), []int{4}
+	return file_library_v1_library_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListBooksResponse) GetBooks() []*Book {
@@ -390,7 +575,7 @@ type Book struct {
 
 func (x *Book) Reset() {
 	*x = Book{}
-	mi := &file_library_v1_library_proto_msgTypes[5]
+	mi := &file_library_v1_library_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -402,7 +587,7 @@ func (x *Book) String() string {
 func (*Book) ProtoMessage() {}
 
 func (x *Book) ProtoReflect() protoreflect.Message {
-	mi := &file_library_v1_library_proto_msgTypes[5]
+	mi := &file_library_v1_library_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -415,7 +600,7 @@ func (x *Book) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Book.ProtoReflect.Descriptor instead.
 func (*Book) Descriptor() ([]byte, []int) {
-	return file_library_v1_library_proto_rawDescGZIP(), []int{5}
+	return file_library_v1_library_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Book) GetId() string {
@@ -460,7 +645,7 @@ type ListReviewsRequest struct {
 
 func (x *ListReviewsRequest) Reset() {
 	*x = ListReviewsRequest{}
-	mi := &file_library_v1_library_proto_msgTypes[6]
+	mi := &file_library_v1_library_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -472,7 +657,7 @@ func (x *ListReviewsRequest) String() string {
 func (*ListReviewsRequest) ProtoMessage() {}
 
 func (x *ListReviewsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_library_v1_library_proto_msgTypes[6]
+	mi := &file_library_v1_library_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -485,7 +670,7 @@ func (x *ListReviewsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListReviewsRequest.ProtoReflect.Descriptor instead.
 func (*ListReviewsRequest) Descriptor() ([]byte, []int) {
-	return file_library_v1_library_proto_rawDescGZIP(), []int{6}
+	return file_library_v1_library_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListReviewsRequest) GetShelfId() string {
@@ -533,7 +718,7 @@ type ListReviewsResponse struct {
 
 func (x *ListReviewsResponse) Reset() {
 	*x = ListReviewsResponse{}
-	mi := &file_library_v1_library_proto_msgTypes[7]
+	mi := &file_library_v1_library_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -545,7 +730,7 @@ func (x *ListReviewsResponse) String() string {
 func (*ListReviewsResponse) ProtoMessage() {}
 
 func (x *ListReviewsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_library_v1_library_proto_msgTypes[7]
+	mi := &file_library_v1_library_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -558,7 +743,7 @@ func (x *ListReviewsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListReviewsResponse.ProtoReflect.Descriptor instead.
 func (*ListReviewsResponse) Descriptor() ([]byte, []int) {
-	return file_library_v1_library_proto_rawDescGZIP(), []int{7}
+	return file_library_v1_library_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListReviewsResponse) GetReviews() []*Review {
@@ -586,7 +771,7 @@ type Review struct {
 
 func (x *Review) Reset() {
 	*x = Review{}
-	mi := &file_library_v1_library_proto_msgTypes[8]
+	mi := &file_library_v1_library_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -598,7 +783,7 @@ func (x *Review) String() string {
 func (*Review) ProtoMessage() {}
 
 func (x *Review) ProtoReflect() protoreflect.Message {
-	mi := &file_library_v1_library_proto_msgTypes[8]
+	mi := &file_library_v1_library_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -611,7 +796,7 @@ func (x *Review) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Review.ProtoReflect.Descriptor instead.
 func (*Review) Descriptor() ([]byte, []int) {
-	return file_library_v1_library_proto_rawDescGZIP(), []int{8}
+	return file_library_v1_library_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *Review) GetId() string {
@@ -640,7 +825,16 @@ var File_library_v1_library_proto protoreflect.FileDescriptor
 const file_library_v1_library_proto_rawDesc = "" +
 	"\n" +
 	"\x18library/v1/library.proto\x12\n" +
-	"library.v1\x1a\x17fluent/v1/options.proto\"P\n" +
+	"library.v1\x1a\x17fluent/v1/options.proto\",\n" +
+	"\x0fGetShelfRequest\x12\x19\n" +
+	"\bshelf_id\x18\x01 \x01(\tR\ashelfId\";\n" +
+	"\x10GetShelfResponse\x12'\n" +
+	"\x05shelf\x18\x01 \x01(\v2\x11.library.v1.ShelfR\x05shelf\"D\n" +
+	"\x0eGetBookRequest\x12\x19\n" +
+	"\bshelf_id\x18\x01 \x01(\tR\ashelfId\x12\x17\n" +
+	"\abook_id\x18\x02 \x01(\tR\x06bookId\"7\n" +
+	"\x0fGetBookResponse\x12$\n" +
+	"\x04book\x18\x01 \x01(\v2\x10.library.v1.BookR\x04book\"P\n" +
 	"\x12ListShelvesRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
@@ -687,8 +881,13 @@ const file_library_v1_library_proto_rawDesc = "" +
 	"\x11GENRE_UNSPECIFIED\x10\x00\x12\x11\n" +
 	"\rGENRE_FICTION\x10\x01\x12\x19\n" +
 	"\x15GENRE_SCIENCE_FICTION\x10\x02\x12\x15\n" +
-	"\x11GENRE_NON_FICTION\x10\x032\x99\x02\n" +
-	"\x0eLibraryService\x12T\n" +
+	"\x11GENRE_NON_FICTION\x10\x032\xbd\x03\n" +
+	"\x0eLibraryService\x12R\n" +
+	"\bGetShelf\x12\x1b.library.v1.GetShelfRequest\x1a\x1c.library.v1.GetShelfResponse\"\v\x92\xb5\x18\a\n" +
+	"\x05Shelf\x12N\n" +
+	"\aGetBook\x12\x1a.library.v1.GetBookRequest\x1a\x1b.library.v1.GetBookResponse\"\n" +
+	"\x92\xb5\x18\x06\n" +
+	"\x04Book\x12T\n" +
 	"\vListShelves\x12\x1e.library.v1.ListShelvesRequest\x1a\x1f.library.v1.ListShelvesResponse\"\x04\x8a\xb5\x18\x00\x12U\n" +
 	"\tListBooks\x12\x1c.library.v1.ListBooksRequest\x1a\x1d.library.v1.ListBooksResponse\"\v\x8a\xb5\x18\a\n" +
 	"\x05Shelf\x12Z\n" +
@@ -711,36 +910,46 @@ func file_library_v1_library_proto_rawDescGZIP() []byte {
 }
 
 var file_library_v1_library_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_library_v1_library_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_library_v1_library_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_library_v1_library_proto_goTypes = []any{
 	(Genre)(0),                  // 0: library.v1.Genre
-	(*ListShelvesRequest)(nil),  // 1: library.v1.ListShelvesRequest
-	(*ListShelvesResponse)(nil), // 2: library.v1.ListShelvesResponse
-	(*Shelf)(nil),               // 3: library.v1.Shelf
-	(*ListBooksRequest)(nil),    // 4: library.v1.ListBooksRequest
-	(*ListBooksResponse)(nil),   // 5: library.v1.ListBooksResponse
-	(*Book)(nil),                // 6: library.v1.Book
-	(*ListReviewsRequest)(nil),  // 7: library.v1.ListReviewsRequest
-	(*ListReviewsResponse)(nil), // 8: library.v1.ListReviewsResponse
-	(*Review)(nil),              // 9: library.v1.Review
+	(*GetShelfRequest)(nil),     // 1: library.v1.GetShelfRequest
+	(*GetShelfResponse)(nil),    // 2: library.v1.GetShelfResponse
+	(*GetBookRequest)(nil),      // 3: library.v1.GetBookRequest
+	(*GetBookResponse)(nil),     // 4: library.v1.GetBookResponse
+	(*ListShelvesRequest)(nil),  // 5: library.v1.ListShelvesRequest
+	(*ListShelvesResponse)(nil), // 6: library.v1.ListShelvesResponse
+	(*Shelf)(nil),               // 7: library.v1.Shelf
+	(*ListBooksRequest)(nil),    // 8: library.v1.ListBooksRequest
+	(*ListBooksResponse)(nil),   // 9: library.v1.ListBooksResponse
+	(*Book)(nil),                // 10: library.v1.Book
+	(*ListReviewsRequest)(nil),  // 11: library.v1.ListReviewsRequest
+	(*ListReviewsResponse)(nil), // 12: library.v1.ListReviewsResponse
+	(*Review)(nil),              // 13: library.v1.Review
 }
 var file_library_v1_library_proto_depIdxs = []int32{
-	3, // 0: library.v1.ListShelvesResponse.shelves:type_name -> library.v1.Shelf
-	0, // 1: library.v1.ListBooksRequest.genre:type_name -> library.v1.Genre
-	6, // 2: library.v1.ListBooksResponse.books:type_name -> library.v1.Book
-	0, // 3: library.v1.Book.genre:type_name -> library.v1.Genre
-	9, // 4: library.v1.ListReviewsResponse.reviews:type_name -> library.v1.Review
-	1, // 5: library.v1.LibraryService.ListShelves:input_type -> library.v1.ListShelvesRequest
-	4, // 6: library.v1.LibraryService.ListBooks:input_type -> library.v1.ListBooksRequest
-	7, // 7: library.v1.LibraryService.ListReviews:input_type -> library.v1.ListReviewsRequest
-	2, // 8: library.v1.LibraryService.ListShelves:output_type -> library.v1.ListShelvesResponse
-	5, // 9: library.v1.LibraryService.ListBooks:output_type -> library.v1.ListBooksResponse
-	8, // 10: library.v1.LibraryService.ListReviews:output_type -> library.v1.ListReviewsResponse
-	8, // [8:11] is the sub-list for method output_type
-	5, // [5:8] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	7,  // 0: library.v1.GetShelfResponse.shelf:type_name -> library.v1.Shelf
+	10, // 1: library.v1.GetBookResponse.book:type_name -> library.v1.Book
+	7,  // 2: library.v1.ListShelvesResponse.shelves:type_name -> library.v1.Shelf
+	0,  // 3: library.v1.ListBooksRequest.genre:type_name -> library.v1.Genre
+	10, // 4: library.v1.ListBooksResponse.books:type_name -> library.v1.Book
+	0,  // 5: library.v1.Book.genre:type_name -> library.v1.Genre
+	13, // 6: library.v1.ListReviewsResponse.reviews:type_name -> library.v1.Review
+	1,  // 7: library.v1.LibraryService.GetShelf:input_type -> library.v1.GetShelfRequest
+	3,  // 8: library.v1.LibraryService.GetBook:input_type -> library.v1.GetBookRequest
+	5,  // 9: library.v1.LibraryService.ListShelves:input_type -> library.v1.ListShelvesRequest
+	8,  // 10: library.v1.LibraryService.ListBooks:input_type -> library.v1.ListBooksRequest
+	11, // 11: library.v1.LibraryService.ListReviews:input_type -> library.v1.ListReviewsRequest
+	2,  // 12: library.v1.LibraryService.GetShelf:output_type -> library.v1.GetShelfResponse
+	4,  // 13: library.v1.LibraryService.GetBook:output_type -> library.v1.GetBookResponse
+	6,  // 14: library.v1.LibraryService.ListShelves:output_type -> library.v1.ListShelvesResponse
+	9,  // 15: library.v1.LibraryService.ListBooks:output_type -> library.v1.ListBooksResponse
+	12, // 16: library.v1.LibraryService.ListReviews:output_type -> library.v1.ListReviewsResponse
+	12, // [12:17] is the sub-list for method output_type
+	7,  // [7:12] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_library_v1_library_proto_init() }
@@ -754,7 +963,7 @@ func file_library_v1_library_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_library_v1_library_proto_rawDesc), len(file_library_v1_library_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

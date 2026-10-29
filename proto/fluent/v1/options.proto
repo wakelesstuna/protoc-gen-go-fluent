@@ -12,6 +12,7 @@ option go_package = "github.com/wakelesstuna/protoc-gen-go-fluent/fluentpb;fluen
 // List methods hang query builders off that tree, and their remaining request
 // fields become chainable setters. List requests must have page_size and
 // page_token, and responses next_page_token plus one repeated message field.
+// Get methods fetch the single resource a Ref points to.
 
 // Resource declares a navigable resource.
 message Resource {
@@ -33,6 +34,17 @@ message ListMethod {
   string name = 2;
 }
 
+// GetMethod marks an RPC that fetches one resource. Generates
+// <Resource>Ref.<name>(ctx) returning the RPC's response message.
+// The request may only contain the id fields of the resource and its ancestors
+// (other fields must be marked skip).
+message GetMethod {
+  // Resource to fetch, e.g. "Book".
+  string resource = 1;
+  // Method name on the Ref. Defaults to "Get".
+  string name = 2;
+}
+
 // Field customizes the setter generated for a request field.
 message Field {
   // Setter name. Defaults to the field's Go name.
@@ -51,6 +63,7 @@ extend google.protobuf.FileOptions {
 
 extend google.protobuf.MethodOptions {
   ListMethod list = 50001;
+  GetMethod get = 50002;
 }
 
 extend google.protobuf.FieldOptions {
