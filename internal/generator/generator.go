@@ -197,11 +197,26 @@ func newListQuery(m *protogen.Method, resources map[string]*resource) (*listQuer
 	opt, _ := proto.GetExtension(m.Desc.Options(), fluentpb.E_List).(*fluentpb.ListMethod)
 
 	q := &listQuery{method: m, name: opt.GetName()}
+	for _, f := range m.Output.Fields {
+		if f.Desc.IsList() && f.Message != nil {
+			if q.items != nil {
+				return nil, fmt.Errorf("response %s has more than one repeated message field", m.Output.Desc.Name())
+			}
+			q.items = f
+		}
+	}
+	if q.items == nil {
+		return nil, fmt.Errorf("response %s has no repeated message field to list", m.Output.Desc.Name())
+	}
+
 	if q.name == "" {
-		q.name = strings.TrimPrefix(m.GoName, "List")
+		// ListBooks -> Books. An RPC named just "List" falls back to the items field: books -> Books.
+		if q.name = strings.TrimPrefix(m.GoName, "List"); q.name == "" {
+			q.name = q.items.GoName
+		}
 	}
 	if !exportedIdent.MatchString(q.name) {
-		return nil, fmt.Errorf("query name %q must be an exported Go identifier", q.name)
+		return nil, fmt.Errorf("query name %q must be an exported Go identifier; set it with option (fluent.v1.list) = {name: \"...\"}", q.name)
 	}
 	if pn := opt.GetParent(); pn != "" {
 		if q.parent = resources[pn]; q.parent == nil {
@@ -258,17 +273,6 @@ func newListQuery(m *protogen.Method, resources map[string]*resource) (*listQuer
 		q.setters = append(q.setters, s)
 	}
 
-	for _, f := range m.Output.Fields {
-		if f.Desc.IsList() && f.Message != nil {
-			if q.items != nil {
-				return nil, fmt.Errorf("response %s has more than one repeated message field", m.Output.Desc.Name())
-			}
-			q.items = f
-		}
-	}
-	if q.items == nil {
-		return nil, fmt.Errorf("response %s has no repeated message field to list", m.Output.Desc.Name())
-	}
 	return q, nil
 }
 

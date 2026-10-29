@@ -233,7 +233,7 @@ Generates a query builder for a unary list RPC.
 | Field    | Meaning |
 |----------|---------|
 | `parent` | Resource the query hangs off. Empty means `Client`. |
-| `name`   | Method name. Defaults to the RPC name without `List` (`ListBooks` → `Books`). |
+| `name`   | Method name. Defaults to the RPC name without `List` (`ListBooks` → `Books`). An RPC named just `List` uses the response's items field (`repeated Book books` → `Books`). |
 
 How the request and response fields are used:
 - **Id fields** of the parent chain are filled in from the Ref.

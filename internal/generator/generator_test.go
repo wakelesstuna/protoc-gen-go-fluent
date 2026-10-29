@@ -251,6 +251,42 @@ func TestGenerateErrors(t *testing.T) {
 	}
 }
 
+func TestQueryNameDefaults(t *testing.T) {
+	// An RPC named just "List" takes its name from the response's items field.
+	out, err := generate(t, Config{Client: true}, func(f *descriptorpb.FileDescriptorProto) {
+		method(f, "ListBooks").Name = proto.String("List")
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, "func (r ShelfRef) Books() BooksQuery") {
+		t.Error(`RPC "List" did not fall back to the items field name`)
+	}
+	if !strings.Contains(out, "resp, err := stub.List(") {
+		t.Error("query does not call the List RPC")
+	}
+
+	// An explicit name wins.
+	out, err = generate(t, Config{Client: true}, func(f *descriptorpb.FileDescriptorProto) {
+		proto.SetExtension(method(f, "ListBooks").Options, fluentpb.E_List, &fluentpb.ListMethod{Parent: "Shelf", Name: "Catalog"})
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, "func (r ShelfRef) Catalog() CatalogQuery") {
+		t.Error("explicit name ignored")
+	}
+}
+
+func TestInvalidQueryNameExplainsFix(t *testing.T) {
+	_, err := generate(t, Config{Client: true}, func(f *descriptorpb.FileDescriptorProto) {
+		proto.SetExtension(method(f, "ListBooks").Options, fluentpb.E_List, &fluentpb.ListMethod{Parent: "Shelf", Name: "books"})
+	})
+	if err == nil || !strings.Contains(err.Error(), "library.v1.LibraryService.ListBooks") || !strings.Contains(err.Error(), "(fluent.v1.list) = {name:") {
+		t.Errorf("err = %v", err)
+	}
+}
+
 func TestNaming(t *testing.T) {
 	for in, want := range map[string]string{
 		"BranchOrder": "BRANCH_ORDER",
