@@ -19,6 +19,14 @@ option (fluent.v1.resource) = {
 
 // LibraryService is a small example API showing every generator feature.
 service LibraryService {
+  // GetShelf returns one shelf.
+  rpc GetShelf(GetShelfRequest) returns (GetShelfResponse) {
+    option (fluent.v1.get) = {resource: "Shelf"};
+  }
+  // GetBook returns one book.
+  rpc GetBook(GetBookRequest) returns (GetBookResponse) {
+    option (fluent.v1.get) = {resource: "Book"};
+  }
   // ListShelves returns the library's shelves.
   rpc ListShelves(ListShelvesRequest) returns (ListShelvesResponse) {
     option (fluent.v1.list) = {};
@@ -31,6 +39,24 @@ service LibraryService {
   rpc ListReviews(ListReviewsRequest) returns (ListReviewsResponse) {
     option (fluent.v1.list) = {parent: "Book"};
   }
+}
+
+message GetShelfRequest {
+  string shelf_id = 1;
+}
+
+message GetShelfResponse {
+  Shelf shelf = 1;
+}
+
+message GetBookRequest {
+  string shelf_id = 1;
+  string book_id = 2;
+}
+
+// Single-message responses are unwrapped: BookRef.Get returns *Book.
+message GetBookResponse {
+  Book book = 1;
 }
 
 message ListShelvesRequest {

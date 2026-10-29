@@ -49,6 +49,8 @@ books, err := client.With(fluent.Metadata("authorization", "Bearer "+token)).
 - **APIs with nested resources.** For example projects → repositories → commits,
   organizations → teams → members, or tenants → clusters → nodes. Parent ids are
   carried along, so callers never repeat them.
+- **Fetching one resource.** `Shelf("sci-fi").Book("dune").Get(ctx)` fills in every
+  parent id for you.
 - **Hiding pagination.** `All` streams items across pages with a Go iterator, `Collect`
   gathers them into a slice, and `Page` gives you manual control (e.g. for a web UI).
   `Limit` caps the total, and the last request shrinks so it doesn't over-fetch.
@@ -241,6 +243,34 @@ How the request and response fields are used:
 - **Every other request field** becomes a setter.
 - **The response's one repeated message field** is the item type.
 
+### `(fluent.v1.get)` (method option)
+
+Generates `<Resource>Ref.Get(ctx)` for a unary RPC that fetches one resource.
+
+```proto
+rpc GetBook(GetBookRequest) returns (GetBookResponse) {
+  option (fluent.v1.get) = { resource: "Book" };      // BookRef.Get(ctx) (*Book, error)
+}
+message GetBookRequest { string shelf_id = 1; string book_id = 2; }
+message GetBookResponse { Book book = 1; }
+```
+
+| Field      | Meaning |
+|------------|---------|
+| `resource` | Resource to fetch. Required. |
+| `name`     | Method name on the Ref. Defaults to `Get`. |
+
+The rules:
+- **Request:** it may only contain the id fields of the resource and its ancestors,
+  which are filled in from the Ref. Mark any other field `skip`.
+- **Unwrapping:** a response with exactly one message field (the `GetBookResponse`
+  style that buf's `STANDARD` lint wants) is unwrapped, so `Get` returns `*Book`.
+  A response that's the resource itself is returned as is.
+
+```go
+book, err := c.Shelf("sci-fi").Book("dune").Get(ctx)
+```
+
 ### `(fluent.v1.field)` (field option)
 
 | Field           | Meaning |
@@ -251,7 +281,8 @@ How the request and response fields are used:
 
 ## Generated API
 
-For each list RPC you get a `<Name>Query` type with:
+For each get RPC you get `<Resource>Ref.Get(ctx)` (see above). For each list RPC you
+get a `<Name>Query` type with:
 
 | Method                    | What it does |
 |---------------------------|--------------|
@@ -353,8 +384,8 @@ It checks for:
 
 ## Limitations
 
-- Only unary list RPCs get query builders. Get/Create/Update/Delete calls go through the
-  regular gRPC stubs.
+- Only list and get RPCs are generated. Create/Update/Delete calls go through the regular
+  gRPC stubs.
 - Setters cover scalar and enum fields. Message, repeated, map and `optional` fields need `skip`.
 - The receiver type is always named `Client`.
 

@@ -52,6 +52,19 @@ func (f *fakeLibrary) window(pageSize int32, token string) (int, int, string) {
 	return start, end, next
 }
 
+func (f *fakeLibrary) GetShelf(ctx context.Context, req *libraryv1.GetShelfRequest) (*libraryv1.GetShelfResponse, error) {
+	f.record(ctx, req)
+	return &libraryv1.GetShelfResponse{Shelf: &libraryv1.Shelf{Id: req.GetShelfId(), Theme: "space"}}, nil
+}
+
+func (f *fakeLibrary) GetBook(ctx context.Context, req *libraryv1.GetBookRequest) (*libraryv1.GetBookResponse, error) {
+	f.record(ctx, req)
+	if req.GetBookId() == "missing" {
+		return nil, status.Error(codes.NotFound, "no such book")
+	}
+	return &libraryv1.GetBookResponse{Book: &libraryv1.Book{Id: req.GetBookId(), Title: "Dune"}}, nil
+}
+
 func (f *fakeLibrary) ListShelves(ctx context.Context, req *libraryv1.ListShelvesRequest) (*libraryv1.ListShelvesResponse, error) {
 	f.record(ctx, req)
 	start, end, next := f.window(req.GetPageSize(), req.GetPageToken())
@@ -188,5 +201,43 @@ func TestErrorsAreStatusErrors(t *testing.T) {
 	_, err := c.Shelf("missing").Books().Collect(context.Background())
 	if status.Code(err) != codes.NotFound {
 		t.Errorf("err = %v, want NotFound", err)
+	}
+}
+
+func TestGet(t *testing.T) {
+	c, fake := newTestClient(t, 0)
+	ctx := context.Background()
+
+	shelf, err := c.Shelf("s1").Get(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if shelf.GetId() != "s1" || shelf.GetTheme() != "space" {
+		t.Errorf("shelf = %v", shelf)
+	}
+
+	book, err := c.Shelf("s1").Book("b2").Get(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if book.GetTitle() != "Dune" {
+		t.Errorf("book = %v", book)
+	}
+	if want := (&libraryv1.GetBookRequest{ShelfId: "s1", BookId: "b2"}); !proto.Equal(fake.requests[1], want) {
+		t.Errorf("request = %v, want %v", fake.requests[1], want)
+	}
+
+	if _, err := c.Shelf("s1").Book("missing").Get(ctx); status.Code(err) != codes.NotFound {
+		t.Errorf("err = %v, want NotFound", err)
+	}
+}
+
+func TestGetSendsMetadata(t *testing.T) {
+	c, fake := newTestClient(t, 0)
+	if _, err := c.With(fluent.Metadata("authorization", "Bearer t")).Shelf("s1").Get(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if got := fake.metadata[0].Get("authorization"); len(got) != 1 || got[0] != "Bearer t" {
+		t.Errorf("authorization = %v", got)
 	}
 }
